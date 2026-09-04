@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Despensa</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23f5f4f0'/%3E%3Crect x='30' y='12' width='40' height='12' rx='4' fill='%230f6e56'/%3E%3Cpath d='M28 26 h44 a4 4 0 0 1 4 4 v50 a10 10 0 0 1 -10 10 h-32 a10 10 0 0 1 -10 -10 v-50 a4 4 0 0 1 4 -4 z' fill='%23ffffff' stroke='%230f6e56' stroke-width='4'/%3E%3Cpath d='M28 44 h44 v32 a10 10 0 0 1 -10 10 h-24 a10 10 0 0 1 -10 -10 z' fill='%23e1f5ee'/%3E%3Ccircle cx='42' cy='58' r='4' fill='%230f6e56'/%3E%3Ccircle cx='58' cy='64' r='4' fill='%230f6e56'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%230f6e56'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23f5f4f0'/%3E%3Crect x='30' y='12' width='40' height='12' rx='4' fill='%230f6e56'/%3E%3Cpath d='M28 26 h44 a4 4 0 0 1 4 4 v50 a10 10 0 0 1 -10 10 h-32 a10 10 0 0 1 -10 -10 v-50 a4 4 0 0 1 4 -4 z' fill='%23ffffff' stroke='%230f6e56' stroke-width='4'/%3E%3Cpath d='M28 44 h44 v32 a10 10 0 0 1 -10 10 h-24 a10 10 0 0 1 -10 -10 z' fill='%23e1f5ee'/%3E%3Ccircle cx='42' cy='58' r='4' fill='%230f6e56'/%3E%3Ccircle cx='58' cy='64' r='4' fill='%230f6e56'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%230f6e56'/%3E%3C/svg%3E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Despensa">
+<meta name="mobile-web-app-capable" content="yes">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --bg:#f5f4f0; --card:#ffffff; --line:#e4e1d8; --text:#2c2c2a; --muted:#6f6d64;
+    --accent:#0f6e56; --accent-bg:#e1f5ee; --danger:#a32d2d; --danger-bg:#fcebeb;
+    --warn:#854f0b; --warn-bg:#faeeda;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  header{position:sticky;top:0;background:var(--bg);padding:16px 16px 8px;z-index:5;}
+  h1{font-size:20px;font-weight:600;margin:0 0 12px;}
+  .tabs{display:flex;gap:8px;margin-bottom:8px;}
+  .tab{flex:1;padding:12px;text-align:center;border-radius:10px;border:1px solid var(--line);background:var(--card);font-size:15px;font-weight:600;color:var(--muted);}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  main{padding:0 16px 100px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;}
+  .inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .card-compact{padding:8px 10px;margin-bottom:0;min-height:0;}
+  .name-compact{font-size:14px;font-weight:600;line-height:1.25;}
+  .meta-compact{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.3;}
+  .qty-big{font-size:22px;font-weight:700;color:var(--accent);}
+  .qty-compact{font-size:16px;min-width:24px;}
+  .btn-round-sm{width:28px;height:28px;font-size:15px;}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .name{font-size:16px;font-weight:600;}
+  .meta{font-size:13px;color:var(--muted);margin-top:2px;}
+  .qty{font-size:20px;font-weight:700;min-width:40px;text-align:center;}
+  .btn{border:none;border-radius:8px;padding:10px 14px;font-size:15px;font-weight:600;cursor:pointer;}
+  .btn-round{width:38px;height:38px;border-radius:50%;font-size:20px;line-height:1;padding:0;}
+  .btn-accent{background:var(--accent);color:#fff;}
+  .btn-outline{background:transparent;border:1px solid var(--line);color:var(--text);}
+  .btn-secondary{background:var(--text);color:#fff;}
+  .btn-danger{background:var(--danger);color:#fff;}
+  .fab{position:fixed;bottom:16px;right:16px;left:16px;display:flex;gap:8px;z-index:10;}
+  .fab .btn{flex:1;padding:11px;font-size:14px;border-radius:12px;}
+  .badge{display:inline-block;font-size:12px;padding:3px 8px;border-radius:6px;font-weight:600;}
+  .badge-warn{background:var(--warn-bg);color:var(--warn);}
+  .badge-danger{background:var(--danger-bg);color:var(--danger);}
+  .empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:15px;}
+  #scanner-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:50;display:none;flex-direction:column;}
+  #scanner-overlay.open{display:flex;}
+  #reader{width:100%;max-width:420px;margin:auto;}
+  .scan-header{display:flex;justify-content:space-between;align-items:center;padding:16px;color:#fff;}
+  .scan-header .btn{background:#fff;color:#000;}
+  #scan-status{color:#fff;text-align:center;padding:8px 16px;font-size:14px;min-height:20px;}
+  #modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:60;display:none;align-items:flex-end;}
+  #modal-overlay.open{display:flex;}
+  #modal{background:var(--card);width:100%;border-radius:16px 16px 0 0;padding:20px;max-height:80vh;overflow:auto;}
+  label{display:block;font-size:12px;color:var(--muted);margin:7px 0 3px;}
+  input,select{width:100%;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px;font-size:14px;background:#fff;color:var(--text);}
+  .modal-actions{display:flex;gap:10px;margin-top:16px;}
+  .modal-actions .btn{flex:1;}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+</style>
+</head>
+<body>
+<h2 class="sr-only">Aplicación de inventario de despensa con escaneo de código de barras, lista de compras y control de stock.</h2>
+
+<div id="despensa-select-overlay" style="position:fixed;inset:0;background:var(--bg);z-index:99;display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="width:100%;max-width:360px;">
+    <h1 style="text-align:center;margin-bottom:20px;">Mi despensa</h1>
+    <div id="ds-status" class="meta" style="text-align:center;margin-bottom:10px;min-height:18px;"></div>
+    <label>Nombre para tu despensa nueva</label>
+    <input id="ds-name" placeholder="Ej: Familia Pérez">
+    <button class="btn btn-accent" id="ds-create" style="width:100%;margin-top:10px;">+ Crear despensa nueva</button>
+    <div class="meta" style="margin:16px 0;text-align:center;">— o —</div>
+    <label>Código de invitación</label>
+    <input id="ds-code" placeholder="Ej: FONCK-a3f9c2">
+    <button class="btn btn-outline" id="ds-join" style="width:100%;margin-top:10px;">Unirme con este código</button>
+  </div>
+</div>
+
+<div id="auth-overlay" style="position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;">
+  <div style="width:100%;max-width:360px;">
+    <h1 style="text-align:center;margin-bottom:20px;">Mi despensa</h1>
+    <div id="auth-status" class="meta" style="text-align:center;margin-bottom:10px;min-height:18px;"></div>
+    <label>Correo</label>
+    <input id="auth-email" type="email" placeholder="tu@correo.com">
+    <label>Contraseña</label>
+    <input id="auth-password" type="password" placeholder="Mínimo 6 caracteres">
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="auth-signup">Crear cuenta</button>
+      <button class="btn btn-accent" id="auth-login">Ingresar</button>
+    </div>
+  </div>
+</div>
+
+<div id="app-root" style="display:none;">
+<header>
+  <div class="row" style="margin-bottom:10px;">
+    <h1 style="margin:0;">Mi despensa</h1>
+    <button class="btn btn-outline" id="btn-despensa-info" style="font-size:13px;padding:6px 12px;" title="Info de la despensa"></button>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-tab="inv">Inventario</div>
+    <div class="tab" data-tab="compras">Lista de compras</div>
+  </div>
+  <div id="inv-filters" class="row" style="gap:8px;margin-top:8px;">
+    <input id="inv-search" placeholder="🔎 Buscar producto..." style="flex:2;">
+    <select id="inv-location-filter" style="flex:1;">
+      <option value="">Todas las ubicaciones</option>
+    </select>
+    <button class="btn btn-round btn-outline" id="btn-manage-locations" title="Editar ubicaciones" style="width:38px;height:38px;flex-shrink:0;">⚙️</button>
+  </div>
+  <div id="inv-filters-2" class="row" style="gap:8px;margin-top:8px;">
+    <select id="inv-category-filter" style="flex:1;">
+      <option value="">Todas las categorías</option>
+    </select>
+    <button class="btn btn-round btn-outline" id="btn-manage-categories" title="Editar categorías" style="width:38px;height:38px;flex-shrink:0;">🏷️</button>
+  </div>
+  <input type="file" id="import-input" accept="application/json" style="display:none;">
+</header>
+
+<main id="content"></main>
+
+<div class="fab">
+  <button class="btn btn-secondary" id="btn-add-manual">+ Agregar manual</button>
+  <button class="btn btn-accent" id="btn-scan">📷 Escanear</button>
+</div>
+
+<div id="scanner-overlay">
+  <div class="scan-header">
+    <span id="scan-mode-label" style="font-weight:600;">Escanear: sacar 1</span>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" id="btn-flip-cam" title="Cambiar cámara">🔄 Cámara</button>
+      <button class="btn" id="btn-close-scan">Cerrar</button>
+    </div>
+  </div>
+  <div id="reader"></div>
+  <div id="scan-status"></div>
+  <div id="scan-bottom-actions" style="padding:16px;display:none;"></div>
+</div>
+
+<div id="modal-overlay">
+  <div id="modal"></div>
+</div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://vunzglostcikazoybhma.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_tkfiLjI5i1OZo-lTUoSrxw_HszY7r7Z';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const STORE_KEY = 'inventario';
+let currentLocations = [];
+function addCustomLocation(loc){
+  if(!currentLocations.includes(loc)){
+    currentLocations.push(loc);
+    saveLocationsToCloud();
+  }
+}
+function allLocations(){ return currentLocations; }
+async function saveLocationsToCloud(){
+  if(!currentDespensaId) return;
+  try{ await supabaseClient.from('despensas').update({ locations: currentLocations.join(',') }).eq('id', currentDespensaId); }
+  catch(e){ console.error('locations save error', e); }
+}
+function getLastLocation(){ return localStorage.getItem('lastLocation_'+currentDespensaId) || ''; }
+function setLastLocation(loc){ localStorage.setItem('lastLocation_'+currentDespensaId, loc||''); }
+let currentCategories = [];
+function addCustomCategory(cat){
+  if(!currentCategories.includes(cat)){
+    currentCategories.push(cat);
+    saveCategoriesToCloud();
+  }
+}
+function allCategories(){ return currentCategories; }
+async function saveCategoriesToCloud(){
+  if(!currentDespensaId) return;
+  try{ await supabaseClient.from('despensas').update({ categories: currentCategories.join(',') }).eq('id', currentDespensaId); }
+  catch(e){ console.error('categories save error', e); }
+}
+let items = {};
+let invSearchQuery = '';
+let invFilterLocation = '';
+let invFilterCategory = '';
+let lastShoppingListNeed = [];
+let currentTab = 'inv';
+let html5QrCode = null;
+let pendingBarcode = null;
+let useFrontCamera = (localStorage.getItem('camPref') === 'front');
+let scanContinuousMode = null; // 'in' | null
+let barcodeScanCallback = null; // when set, scanning fills a field instead of normal logic
+let realtimeChannel = null;
+let currentDespensaId = null;
+
+function rowToItem(r){
+  return { id:r.id, name:r.name, qty:r.qty||0, min:r.min||0, target:r.target||1,
+    barcode:r.barcode||null, wanted:!!r.wanted, wantedQty:r.wanted_qty||null, pendingStore:r.pending_store||null,
+    location:r.location||null, category:r.category||null, barcodes: r.barcodes ? String(r.barcodes).split(',').filter(Boolean) : [] };
+}
+function itemToRow(it){
+  return { id:it.id, name:it.name, qty:it.qty||0, min:it.min||0, target:it.target||1,
+    barcode:it.barcode||null, wanted:!!it.wanted, wanted_qty:it.wantedQty||null,
+    pending_store:it.pendingStore||null, location:it.location||null, category:it.category||null,
+    barcodes: (it.barcodes||[]).join(','), updated_at:new Date().toISOString(),
+    despensa_id: currentDespensaId };
+}
+
+let barcodeIndex = {};
+function buildBarcodeIndex(){
+  barcodeIndex = {};
+  Object.values(items).forEach(it=>{
+    (it.barcodes||[]).forEach(code=>{ barcodeIndex[code] = it.id; });
+    if(it.barcode) barcodeIndex[it.barcode] = it.id;
+  });
+}
+function findItemByAnyCode(code){
+  if(items[code]) return items[code];
+  if(barcodeIndex[code]) return items[barcodeIndex[code]];
+  return null;
+}
+
+function storeKey(){ return STORE_KEY + '_' + currentDespensaId; }
+
+async function syncToCloud(){
+  const rows = Object.values(items).map(itemToRow);
+  if(rows.length===0) return;
+  try{ await supabaseClient.from('despensa_items').upsert(rows); }
+  catch(e){ console.error('sync error', e); }
+}
+async function deleteFromCloud(id){
+  try{ await supabaseClient.from('despensa_items').delete().eq('id', id); }
+  catch(e){ console.error('delete sync error', e); }
+}
+
+function load(){
+  try{
+    const raw = localStorage.getItem(storeKey());
+    items = raw ? JSON.parse(raw) : {};
+  }catch(e){ items = {}; }
+  render();
+  refreshFromCloud();
+}
+async function refreshFromCloud(){
+  try{
+    const { data, error } = await supabaseClient.from('despensa_items').select('*').eq('despensa_id', currentDespensaId);
+    if(!error && data){
+      items = {};
+      data.forEach(r=>{ items[r.id] = rowToItem(r); });
+      localStorage.setItem(storeKey(), JSON.stringify(items));
+      render();
+    }
+  }catch(e){ console.error('refresh error', e); }
+}
+function save(){
+  try{ localStorage.setItem(storeKey(), JSON.stringify(items)); }
+  catch(e){ console.error('storage error', e); }
+  syncToCloud();
+}
+
+function startRealtime(){
+  if(realtimeChannel) return;
+  realtimeChannel = supabaseClient.channel('despensa_items_changes_'+currentDespensaId)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'despensa_items', filter: `despensa_id=eq.${currentDespensaId}` }, ()=>{
+      refreshFromCloud();
+    })
+    .subscribe();
+}
+
+let currentUserEmail = '';
+let currentDespensaName = '';
+let currentInviteCode = '';
+
+function showApp(session){
+  document.getElementById('auth-overlay').style.display = 'none';
+  document.getElementById('despensa-select-overlay').style.display = 'none';
+  document.getElementById('app-root').style.display = 'block';
+  currentUserEmail = session.user.email;
+  document.getElementById('btn-despensa-info').textContent = currentDespensaName || 'Despensa';
+  startRealtime();
+  load();
+}
+function showAuth(){
+  document.getElementById('auth-overlay').style.display = 'flex';
+  document.getElementById('despensa-select-overlay').style.display = 'none';
+  document.getElementById('app-root').style.display = 'none';
+  currentDespensaId = null;
+}
+function showDespensaSelect(){
+  document.getElementById('auth-overlay').style.display = 'none';
+  document.getElementById('despensa-select-overlay').style.display = 'flex';
+  document.getElementById('app-root').style.display = 'none';
+}
+
+async function checkDespensaMembership(session){
+  try{
+    const { data, error } = await supabaseClient.from('despensa_members').select('despensa_id').eq('user_id', session.user.id).limit(1);
+    if(error){ console.error(error); showDespensaSelect(); return; }
+    if(data && data.length>0){
+      currentDespensaId = data[0].despensa_id;
+      localStorage.setItem('currentDespensaId', currentDespensaId);
+      // fetch invite code and locations for display
+      const { data: d2 } = await supabaseClient.from('despensas').select('invite_code,name,locations,categories').eq('id', currentDespensaId).single();
+      currentDespensaName = d2 ? d2.name : '';
+      currentInviteCode = d2 ? d2.invite_code : '';
+      currentLocations = (d2 && d2.locations) ? d2.locations.split(',').filter(Boolean) : [];
+      currentCategories = (d2 && d2.categories) ? d2.categories.split(',').filter(Boolean) : [];
+      showApp(session);
+    } else {
+      showDespensaSelect();
+    }
+  }catch(e){ console.error(e); showDespensaSelect(); }
+}
+
+document.getElementById('auth-login').addEventListener('click', async ()=>{
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const statusEl = document.getElementById('auth-status');
+  statusEl.textContent = 'Ingresando...';
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if(error){ statusEl.textContent = 'Correo o contraseña incorrectos.'; }
+});
+document.getElementById('auth-signup').addEventListener('click', async ()=>{
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const statusEl = document.getElementById('auth-status');
+  if(password.length < 6){ statusEl.textContent = 'La contraseña debe tener al menos 6 caracteres.'; return; }
+  statusEl.textContent = 'Creando cuenta...';
+  const { error } = await supabaseClient.auth.signUp({ email, password });
+  if(error){ statusEl.textContent = error.message; }
+  else{ statusEl.textContent = 'Cuenta creada. Si pide confirmación, revisa tu correo; si no, ya puedes ingresar.'; }
+});
+document.getElementById('btn-logout-modal') && null;
+async function doLogout(){
+  if(realtimeChannel){ supabaseClient.removeChannel(realtimeChannel); realtimeChannel = null; }
+  currentDespensaId = null;
+  await supabaseClient.auth.signOut();
+}
+function showChangePasswordModal(){
+  openModal(`
+    <label>Nueva contraseña</label>
+    <input id="cp-new" type="password" placeholder="Mínimo 6 caracteres">
+    <label>Repite la nueva contraseña</label>
+    <input id="cp-confirm" type="password">
+    <div id="cp-status" class="meta" style="margin-top:6px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" id="cp-save">Guardar</button>
+    </div>
+  `);
+  document.getElementById('cp-save').addEventListener('click', async ()=>{
+    const p1 = document.getElementById('cp-new').value;
+    const p2 = document.getElementById('cp-confirm').value;
+    const statusEl = document.getElementById('cp-status');
+    if(p1.length < 6){ statusEl.textContent = 'Debe tener al menos 6 caracteres.'; return; }
+    if(p1 !== p2){ statusEl.textContent = 'Las contraseñas no coinciden.'; return; }
+    statusEl.textContent = 'Guardando...';
+    const { error } = await supabaseClient.auth.updateUser({ password: p1 });
+    if(error){ statusEl.textContent = 'Error: ' + error.message; }
+    else { statusEl.textContent = 'Contraseña actualizada.'; setTimeout(closeModal, 1200); }
+  });
+}
+document.getElementById('btn-despensa-info').addEventListener('click', ()=>{
+  openModal(`
+    <label>Despensa</label>
+    <div class="meta" style="margin-bottom:10px;">${esc(currentDespensaName)}</div>
+    <label>Cuenta</label>
+    <div class="meta" style="margin-bottom:10px;">${esc(currentUserEmail)}</div>
+    <label>Código de invitación</label>
+    <div class="meta" style="margin-bottom:14px;">${esc(currentInviteCode)}</div>
+    <div class="row" style="gap:8px;margin-bottom:8px;">
+      <button class="btn btn-outline" id="info-export" style="flex:1;font-size:13px;padding:8px;">⬇️ Exportar</button>
+      <button class="btn btn-outline" id="info-import" style="flex:1;font-size:13px;padding:8px;">⬆️ Importar</button>
+    </div>
+    <button class="btn btn-outline" id="info-share" style="width:100%;margin-bottom:8px;" ${lastShoppingListNeed.length===0?'disabled':''}>📤 Compartir lista de compras</button>
+    <button class="btn btn-outline" id="info-change-password" style="width:100%;margin-bottom:8px;">🔑 Cambiar contraseña</button>
+    <button class="btn btn-danger" id="info-logout" style="width:100%;">Cerrar sesión</button>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()" style="width:100%;">Cerrar</button>
+    </div>
+  `);
+  document.getElementById('info-change-password').addEventListener('click', ()=>{
+    showChangePasswordModal();
+  });
+  document.getElementById('info-logout').addEventListener('click', ()=>{
+    closeModal();
+    doLogout();
+  });
+  document.getElementById('info-share').addEventListener('click', ()=>{
+    if(lastShoppingListNeed.length===0) return;
+    closeModal();
+    shareList(lastShoppingListNeed);
+  });
+  document.getElementById('info-export').addEventListener('click', ()=>{
+    closeModal();
+    exportBackup();
+  });
+  document.getElementById('info-import').addEventListener('click', ()=>{
+    closeModal();
+    document.getElementById('import-input').click();
+  });
+});
+
+document.getElementById('ds-create').addEventListener('click', async ()=>{
+  const name = document.getElementById('ds-name').value.trim();
+  const statusEl = document.getElementById('ds-status');
+  if(!name){ statusEl.textContent = 'Ponle un nombre a tu despensa.'; return; }
+  statusEl.textContent = 'Creando...';
+  const { data: session } = await supabaseClient.auth.getSession();
+  const userId = session.session.user.id;
+  const inviteCode = name.replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,6) + '-' + Math.random().toString(36).slice(2,8);
+  const { data, error } = await supabaseClient.from('despensas').insert({ name, invite_code: inviteCode, created_by: userId }).select().single();
+  if(error){ statusEl.textContent = 'Error: ' + error.message; return; }
+  const { error: memberError } = await supabaseClient.from('despensa_members').insert({ despensa_id: data.id, user_id: userId });
+  if(memberError){ statusEl.textContent = 'Error: ' + memberError.message; return; }
+  checkDespensaMembership(session.session);
+});
+document.getElementById('ds-join').addEventListener('click', async ()=>{
+  const code = document.getElementById('ds-code').value.trim().toUpperCase();
+  const statusEl = document.getElementById('ds-status');
+  if(!code){ statusEl.textContent = 'Escribe el código de invitación.'; return; }
+  statusEl.textContent = 'Buscando despensa...';
+  const { data: found, error: findError } = await supabaseClient.from('despensas').select('id,name').eq('invite_code', code).single();
+  if(findError || !found){ statusEl.textContent = 'No se encontró ninguna despensa con ese código.'; return; }
+  const { data: session } = await supabaseClient.auth.getSession();
+  const userId = session.session.user.id;
+  const { error: memberError } = await supabaseClient.from('despensa_members').insert({ despensa_id: found.id, user_id: userId });
+  if(memberError){ statusEl.textContent = 'Error: ' + memberError.message; return; }
+  statusEl.textContent = `Te uniste a "${found.name}".`;
+  checkDespensaMembership(session.session);
+});
+
+supabaseClient.auth.onAuthStateChange((event, session)=>{
+  if(session){ checkDespensaMembership(session); }
+  else{ showAuth(); }
+});
+supabaseClient.auth.getSession().then(({ data })=>{
+  if(data.session){ checkDespensaMembership(data.session); } else { showAuth(); }
+});
+
+function normalizeText(s){
+  return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+}
+function render(){
+  buildBarcodeIndex();
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===currentTab));
+  document.getElementById('inv-filters').style.display = 'flex';
+  document.getElementById('inv-filters-2').style.display = 'flex';
+  document.getElementById('inv-search').style.display = currentTab==='inv' ? '' : 'none';
+  const locFilterSel = document.getElementById('inv-location-filter');
+  const usedLocs = [...new Set(Object.values(items).map(it=>it.location).filter(Boolean))];
+  const currentFilterVal = invFilterLocation;
+  locFilterSel.innerHTML = `<option value="">Todas las ubicaciones</option>` +
+    usedLocs.sort().map(l=>`<option value="${esc(l)}" ${l===currentFilterVal?'selected':''}>${esc(l)}</option>`).join('') +
+    `<option value="__sin_ubicacion__" ${currentFilterVal==='__sin_ubicacion__'?'selected':''}>Sin ubicación</option>`;
+  const catFilterSel = document.getElementById('inv-category-filter');
+  const usedCats = [...new Set(Object.values(items).map(it=>it.category).filter(Boolean))];
+  const currentCatFilterVal = invFilterCategory;
+  catFilterSel.innerHTML = `<option value="">Todas las categorías</option>` +
+    usedCats.sort().map(c=>`<option value="${esc(c)}" ${c===currentCatFilterVal?'selected':''}>${esc(c)}</option>`).join('') +
+    `<option value="__sin_categoria__" ${currentCatFilterVal==='__sin_categoria__'?'selected':''}>Sin categoría</option>`;
+  const c = document.getElementById('content');
+  let list = Object.values(items);
+  if(invFilterLocation==='__sin_ubicacion__'){
+    list = list.filter(it=>!it.location);
+  } else if(invFilterLocation){
+    list = list.filter(it=>it.location===invFilterLocation);
+  }
+  if(invFilterCategory==='__sin_categoria__'){
+    list = list.filter(it=>!it.category);
+  } else if(invFilterCategory){
+    list = list.filter(it=>it.category===invFilterCategory);
+  }
+  if(currentTab==='inv'){
+    if(invSearchQuery.trim()){
+      const q = normalizeText(invSearchQuery.trim());
+      if(q==='codigo'){
+        list = list.filter(it=>!it.barcode);
+      } else {
+        list = list.filter(it=>normalizeText(it.name).includes(q));
+      }
+    }
+    if(list.length===0){ c.innerHTML = '<div class="empty">No se encontraron productos con ese filtro.</div>'; return; }
+    const groups = {};
+    list.forEach(it=>{
+      const loc = it.location || 'Sin ubicación';
+      if(!groups[loc]) groups[loc] = [];
+      groups[loc].push(it);
+    });
+    const locOrder = [...allLocations(), 'Sin ubicación'];
+    const sortedLocs = Object.keys(groups).sort((a,b)=>{
+      const ia = locOrder.indexOf(a), ib = locOrder.indexOf(b);
+      return (ia===-1?999:ia) - (ib===-1?999:ib);
+    });
+    c.innerHTML = sortedLocs.map(loc=>{
+      const groupItems = groups[loc].sort((a,b)=>a.name.localeCompare(b.name));
+      const itemsHtml = groupItems.map(it=>{
+        const low = it.qty<=it.min;
+        return `<div class="card card-compact" onclick="showQuantityModal('${it.id}')" style="cursor:pointer;">
+          <div class="name-compact">${esc(it.name)}</div>
+          <div class="row" style="align-items:baseline;margin-top:2px;">
+            <div class="meta-compact">Mín: ${it.min}${low?' <span class="badge badge-danger">bajo</span>':''}</div>
+            <div class="qty-big">${it.qty}</div>
+          </div>
+        </div>`;
+      }).join('');
+      return `<div class="meta" style="font-weight:700;color:var(--text);font-size:14px;margin:14px 0 6px;">${esc(loc)}</div><div class="inv-grid">${itemsHtml}</div>`;
+    }).join('');
+  } else {
+    const need = list.filter(it=>(it.qty<=it.min || it.wanted) && !it.pendingStore);
+    const pending = list.filter(it=>it.pendingStore);
+    c.innerHTML =
+      (pending.length>0 ? `<div class="row" style="margin-bottom:6px;">
+          <div class="meta" style="font-weight:600;">Compradas, por guardar en la despensa</div>
+          <button class="btn btn-outline" id="btn-clear-pending" style="font-size:12px;padding:6px 10px;">🧹 Limpiar todo</button>
+        </div>` +
+        pending.sort((a,b)=>a.name.localeCompare(b.name)).map(it=>`<div class="card" style="border-color:var(--accent);">
+          <div class="row">
+            <div>
+              <div class="name">${esc(it.name)}</div>
+              <div class="meta">Compraste ${it.pendingStore}${it.barcode?' · escanéalo para guardar rápido':''}</div>
+            </div>
+            <button class="btn btn-accent" onclick="markStored('${it.id}')">Guardar</button>
+          </div>
+        </div>`).join('') + `<div style="height:14px;"></div>` : '') +
+      `<div class="row" style="gap:8px;margin-bottom:10px;">
+        <button class="btn btn-outline" id="btn-add-to-list" style="flex:1;">+ Agregar algo</button>
+      </div>` +
+      (need.length===0 && pending.length===0 ? '<div class="empty">Nada por comprar por ahora.</div>' :
+      need.sort((a,b)=>a.name.localeCompare(b.name)).map(it=>{
+        const suggested = it.wantedQty ? it.wantedQty : Math.max(1, (it.target || it.min || 1) - it.qty);
+        return `<div class="card">
+      <div class="row">
+        <div>
+          <div class="name">${esc(it.name)}</div>
+          <div class="meta">Tienes ${it.qty}, mínimo ${it.min} · comprar ~${suggested}${(it.wanted && it.qty>it.min)?' · agregado a mano':''}</div>
+        </div>
+        <button class="btn btn-accent" onclick="restock('${it.id}')">Comprar</button>
+      </div>
+    </div>`;
+      }).join(''));
+    const addBtn = document.getElementById('btn-add-to-list');
+    if(addBtn) addBtn.addEventListener('click', showAddToListForm);
+    lastShoppingListNeed = need;
+    const clearBtn = document.getElementById('btn-clear-pending');
+    if(clearBtn) clearBtn.addEventListener('click', ()=>{
+      if(confirm('¿Descartar todas las compras pendientes de guardar? No se sumarán al inventario.')){
+        pending.forEach(it=>{ it.pendingStore = null; });
+        save(); render();
+      }
+    });
+  }
+}
+
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function stepperHtml(id, value){
+  return `<div class="row" style="gap:10px;justify-content:center;margin:4px 0;">
+    <button type="button" class="btn btn-round btn-outline stepper-minus" data-target="${id}" style="width:36px;height:36px;font-size:18px;">–</button>
+    <div class="qty" id="${id}" data-val="${value}" style="font-size:19px;min-width:38px;">${value}</div>
+    <button type="button" class="btn btn-round btn-outline stepper-plus" data-target="${id}" style="width:36px;height:36px;font-size:18px;">+</button>
+  </div>`;
+}
+function bindSteppers(root){
+  root.querySelectorAll('.stepper-minus').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const el = document.getElementById(b.dataset.target);
+      const v = Math.max(0, parseInt(el.dataset.val)-1);
+      el.dataset.val = v; el.textContent = v;
+    });
+  });
+  root.querySelectorAll('.stepper-plus').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const el = document.getElementById(b.dataset.target);
+      const v = parseInt(el.dataset.val)+1;
+      el.dataset.val = v; el.textContent = v;
+    });
+  });
+}
+function stepperVal(id){
+  const el = document.getElementById(id);
+  return el ? parseInt(el.dataset.val)||0 : 0;
+}
+function locationFieldHtml(id, selected){
+  const locs = allLocations();
+  const isCustom = selected && !locs.includes(selected);
+  return `<select id="${id}">
+    <option value="">Sin ubicación</option>
+    ${locs.map(l=>`<option value="${esc(l)}" ${l===selected?'selected':''}>${esc(l)}</option>`).join('')}
+    <option value="__new__" ${isCustom?'selected':''}>+ Otra ubicación...</option>
+  </select>
+  <input id="${id}-custom" placeholder="Nombre de la nueva ubicación" style="margin-top:6px;display:${isCustom?'block':'none'};" value="${isCustom?esc(selected):''}">`;
+}
+function bindLocationField(id){
+  const sel = document.getElementById(id);
+  const customInput = document.getElementById(id+'-custom');
+  sel.addEventListener('change', ()=>{
+    customInput.style.display = sel.value==='__new__' ? 'block' : 'none';
+  });
+}
+function locationFieldVal(id){
+  const sel = document.getElementById(id);
+  if(sel.value==='__new__'){
+    const custom = document.getElementById(id+'-custom').value.trim();
+    if(custom){ addCustomLocation(custom); return custom; }
+    return null;
+  }
+  return sel.value || null;
+}
+function categoryFieldHtml(id, selected){
+  const cats = allCategories();
+  const isCustom = selected && !cats.includes(selected);
+  return `<select id="${id}">
+    <option value="">Sin categoría</option>
+    ${cats.map(c=>`<option value="${esc(c)}" ${c===selected?'selected':''}>${esc(c)}</option>`).join('')}
+    <option value="__new__" ${isCustom?'selected':''}>+ Otra categoría...</option>
+  </select>
+  <input id="${id}-custom" placeholder="Nombre de la nueva categoría" style="margin-top:6px;display:${isCustom?'block':'none'};" value="${isCustom?esc(selected):''}">`;
+}
+function bindCategoryField(id){
+  const sel = document.getElementById(id);
+  const customInput = document.getElementById(id+'-custom');
+  sel.addEventListener('change', ()=>{
+    customInput.style.display = sel.value==='__new__' ? 'block' : 'none';
+  });
+}
+function categoryFieldVal(id){
+  const sel = document.getElementById(id);
+  if(sel.value==='__new__'){
+    const custom = document.getElementById(id+'-custom').value.trim();
+    if(custom){ addCustomCategory(custom); return custom; }
+    return null;
+  }
+  return sel.value || null;
+}
+
+async function shareList(need){
+  const text = 'Lista de compras:\n' + need.map(it=>{
+    const suggested = it.wantedQty ? it.wantedQty : Math.max(1, (it.target || it.min || 1) - it.qty);
+    return `- ${it.name} (x${suggested})`;
+  }).join('\n');
+  if(navigator.share){
+    try{ await navigator.share({ title: 'Lista de compras', text }); }
+    catch(e){ /* usuario canceló */ }
+  } else {
+    try{
+      await navigator.clipboard.writeText(text);
+      alert('Lista copiada al portapapeles (tu navegador no soporta compartir directo).');
+    }catch(e){
+      alert(text);
+    }
+  }
+}
+
+window.changeQty = function(id, delta){
+  const it = items[id];
+  if(!it) return;
+  it.qty = Math.max(0, it.qty + delta);
+  save(); render();
+}
+window.showQuantityModal = function(id){
+  const it = items[id];
+  if(!it) return;
+  openModal(`
+    <label>${esc(it.name)}</label>
+    <div class="meta" style="margin-bottom:8px;">Mínimo: ${it.min}${it.location?' · '+esc(it.location):''}</div>
+    ${stepperHtml('qm-qty', it.qty)}
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" id="qm-save">Guardar</button>
+    </div>
+    <button class="btn btn-outline" id="qm-edit" style="width:100%;margin-top:10px;">✏️ Editar producto</button>
+  `);
+  bindSteppers(document.getElementById('modal'));
+  document.getElementById('qm-save').addEventListener('click', ()=>{
+    it.qty = stepperVal('qm-qty');
+    save(); closeModal(); render();
+  });
+  document.getElementById('qm-edit').addEventListener('click', ()=>{
+    modalStack.push({ render: ()=> showQuantityModal(id) });
+    history.pushState({ nested: true }, '');
+    editItem(id);
+  });
+}
+window.editItem = function(id){
+  const it = items[id];
+  if(!it) return;
+  openModal(`
+    <label>Nombre del producto</label>
+    <input id="e-name" value="${esc(it.name)}">
+    <label>Cantidad actual</label>
+    ${stepperHtml('e-qty', it.qty)}
+    <label>Mínimo antes de reponer</label>
+    ${stepperHtml('e-min', it.min)}
+    <label>Stock objetivo (cuánto tener después de comprar)</label>
+    ${stepperHtml('e-target', it.target || it.min || 1)}
+    <label>Ubicación</label>
+    ${locationFieldHtml('e-location', it.location)}
+    <label>Categoría</label>
+    ${categoryFieldHtml('e-category', it.category)}
+    <label>Código de barras</label>
+    <div class="row" style="gap:8px;">
+      <input id="e-barcode" value="${it.barcode?esc(it.barcode):''}" placeholder="Sin código todavía" style="flex:1;">
+      <button type="button" class="btn btn-outline" id="e-scan-barcode" style="white-space:nowrap;">📷 Leer</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="e-delete">Eliminar producto</button>
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" id="e-save">Guardar</button>
+    </div>
+    <button class="btn btn-outline" id="e-merge" style="width:100%;margin-top:8px;font-size:13px;padding:8px;">🔗 Fusionar con otro producto</button>
+  `);
+  bindSteppers(document.getElementById('modal'));
+  bindLocationField('e-location');
+  bindCategoryField('e-category');
+  document.getElementById('e-scan-barcode').addEventListener('click', ()=>{
+    scanBarcodeInto('e-barcode', ()=> editItem(id));
+  });
+  document.getElementById('e-save').addEventListener('click', ()=>{
+    const name = document.getElementById('e-name').value.trim();
+    const errEl = document.getElementById('e-name');
+    if(!name){ errEl.style.borderColor = 'var(--danger)'; return; }
+    const newBarcode = document.getElementById('e-barcode').value.trim() || null;
+    it.name = name;
+    it.qty = stepperVal('e-qty');
+    it.min = stepperVal('e-min');
+    it.target = Math.max(it.min, stepperVal('e-target'));
+    it.location = locationFieldVal('e-location');
+    setLastLocation(it.location);
+    it.category = categoryFieldVal('e-category');
+    if(newBarcode !== it.barcode){
+      if(newBarcode){
+        const existing = findItemByAnyCode(newBarcode);
+        if(existing && existing.id !== id){
+          alert('Ese código de barras ya está siendo usado por otro producto.');
+          return;
+        }
+      }
+      it.barcode = newBarcode;
+    }
+    save(); closeModal(); render();
+  });
+  document.getElementById('e-delete').addEventListener('click', ()=>{
+    if(confirm(`¿Eliminar "${it.name}" del inventario?`)){
+      delete items[id];
+      save(); deleteFromCloud(id); closeModal(); render();
+    }
+  });
+  document.getElementById('e-merge').addEventListener('click', ()=>{
+    showMergeForm(id);
+  });
+}
+function showMergeForm(sourceId){
+  const source = items[sourceId];
+  const others = Object.values(items).filter(it=>it.id!==sourceId);
+  if(others.length===0){ alert('No hay otros productos para fusionar.'); return; }
+  openModal(`
+    <label>Fusionar "${esc(source.name)}" con:</label>
+    <select id="merge-target">
+      <option value="">-- Elegir producto destino --</option>
+      ${others.sort((a,b)=>a.name.localeCompare(b.name)).map(it=>`<option value="${it.id}">${esc(it.name)}</option>`).join('')}
+    </select>
+    <div class="meta" style="margin-top:8px;">Se sumará el stock, se unirán los códigos de barra, y "${esc(source.name)}" se eliminará. Esta acción no se puede deshacer.</div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger" id="merge-confirm">Fusionar</button>
+    </div>
+  `);
+  document.getElementById('merge-confirm').addEventListener('click', ()=>{
+    const targetId = document.getElementById('merge-target').value;
+    if(!targetId) return;
+    const target = items[targetId];
+    target.qty += source.qty;
+    target.barcodes = target.barcodes || [];
+    if(source.barcode && !target.barcodes.includes(source.barcode)) target.barcodes.push(source.barcode);
+    (source.barcodes||[]).forEach(code=>{ if(!target.barcodes.includes(code)) target.barcodes.push(code); });
+    if(sourceId !== source.barcode && !target.barcodes.includes(sourceId)) target.barcodes.push(sourceId);
+    delete items[sourceId];
+    save(); deleteFromCloud(sourceId); closeModal(); render();
+  });
+}
+window.restock = function(id){
+  const it = items[id];
+  if(!it) return;
+  const suggested = it.wantedQty ? it.wantedQty : Math.max(1, (it.target || it.min || 1) - it.qty);
+  openModal(`
+    <label>¿Cuánto compraste de "${esc(it.name)}"?</label>
+    ${stepperHtml('f-restock-qty', suggested)}
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" id="f-restock-save">Guardar</button>
+    </div>
+  `);
+  bindSteppers(document.getElementById('modal'));
+  document.getElementById('f-restock-save').addEventListener('click', ()=>{
+    const addQty = stepperVal('f-restock-qty');
+    it.pendingStore = addQty;
+    it.wanted = false;
+    it.wantedQty = null;
+    save(); closeModal(); render();
+  });
+}
+window.markStored = function(id){
+  const it = items[id];
+  if(!it || !it.pendingStore) return;
+  it.qty += it.pendingStore;
+  it.pendingStore = null;
+  save(); render();
+}
+
+function showAddToListForm(){
+  const existing = Object.values(items).filter(it=>!(it.qty<=it.min || it.wanted));
+  openModal(`
+    <label>¿Ya existe en tu inventario?</label>
+    <select id="atl-existing">
+      <option value="">-- Elegir producto existente --</option>
+      ${existing.map(it=>`<option value="${it.id}">${esc(it.name)}</option>`).join('')}
+    </select>
+    <div class="meta" style="margin:10px 0;text-align:center;">— o crea uno nuevo —</div>
+    <label>Nombre del producto nuevo</label>
+    <input id="atl-name" placeholder="Ej: velas para cumpleaños">
+    <label>¿Cuántos quieres comprar?</label>
+    ${stepperHtml('atl-qty', 1)}
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" id="atl-save">Agregar a la lista</button>
+    </div>
+  `);
+  bindSteppers(document.getElementById('modal'));
+  document.getElementById('atl-save').addEventListener('click', ()=>{
+    const existingId = document.getElementById('atl-existing').value;
+    const newName = document.getElementById('atl-name').value.trim();
+    const wantQty = Math.max(1, stepperVal('atl-qty'));
+    if(existingId){
+      items[existingId].wanted = true;
+      items[existingId].wantedQty = wantQty;
+    } else if(newName){
+      const id = 'm_'+Date.now();
+      items[id] = { id, name: newName, qty: 0, min: 0, target: wantQty, wanted: true, wantedQty: wantQty, barcode: null };
+    } else {
+      return;
+    }
+    save(); closeModal(); render();
+  });
+}
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{ currentTab = t.dataset.tab; render(); });
+});
+document.getElementById('inv-search').addEventListener('input', (e)=>{
+  invSearchQuery = e.target.value;
+  render();
+});
+document.getElementById('inv-location-filter').addEventListener('change', (e)=>{
+  invFilterLocation = e.target.value;
+  render();
+});
+document.getElementById('inv-category-filter').addEventListener('change', (e)=>{
+  invFilterCategory = e.target.value;
+  render();
+});
+document.getElementById('btn-manage-locations').addEventListener('click', showManageLocations);
+
+function showManageLocations(){
+  openModal(`
+    <label>Ubicaciones de esta despensa</label>
+    ${currentLocations.length===0 ? '<div class="meta">Todavía no has agregado ninguna.</div>' :
+      currentLocations.map(loc=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line);">
+        <div>${esc(loc)}</div>
+        <button class="btn btn-danger" style="padding:6px 12px;font-size:13px;" onclick="deleteLocation('${esc(loc).replace(/'/g,"\\'")}')">Borrar</button>
+      </div>`).join('')}
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()" style="width:100%;">Cerrar</button>
+    </div>
+  `);
+}
+
+window.deleteLocation = function(loc){
+  const affected = Object.values(items).filter(it=>it.location===loc);
+  if(affected.length===0){
+    if(!confirm(`¿Borrar la ubicación "${loc}"?`)) return;
+    currentLocations = currentLocations.filter(l=>l!==loc);
+    saveLocationsToCloud();
+    showManageLocations();
+    render();
+    return;
+  }
+  const otherLocs = currentLocations.filter(l=>l!==loc);
+  openModal(`
+    <label>"${esc(loc)}" tiene ${affected.length} producto(s) asignado(s)</label>
+    <div class="meta" style="margin-bottom:8px;">¿Dónde quieres moverlos?</div>
+    <select id="dl-target">
+      <option value="">Sin ubicación</option>
+      ${otherLocs.map(l=>`<option value="${esc(l)}">${esc(l)}</option>`).join('')}
+    </select>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger" id="dl-confirm">Mover y borrar ubicación</button>
+    </div>
+  `);
+  document.getElementById('dl-confirm').addEventListener('click', ()=>{
+    const target = document.getElementById('dl-target').value || null;
+    affected.forEach(it=>{ it.location = target; });
+    save();
+    currentLocations = currentLocations.filter(l=>l!==loc);
+    saveLocationsToCloud();
+    closeModal();
+    render();
+  });
+}
+
+document.getElementById('btn-manage-categories').addEventListener('click', showManageCategories);
+
+function showManageCategories(){
+  openModal(`
+    <label>Categorías de esta despensa</label>
+    ${currentCategories.length===0 ? '<div class="meta">Todavía no has agregado ninguna.</div>' :
+      currentCategories.map(cat=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line);">
+        <div>${esc(cat)}</div>
+        <button class="btn btn-danger" style="padding:6px 12px;font-size:13px;" onclick="deleteCategory('${esc(cat).replace(/'/g,"\\'")}')">Borrar</button>
+      </div>`).join('')}
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()" style="width:100%;">Cerrar</button>
+    </div>
+  `);
+}
+
+window.deleteCategory = function(cat){
+  const affected = Object.values(items).filter(it=>it.category===cat);
+  if(affected.length===0){
+    if(!confirm(`¿Borrar la categoría "${cat}"?`)) return;
+    currentCategories = currentCategories.filter(c=>c!==cat);
+    saveCategoriesToCloud();
+    showManageCategories();
+    render();
+    return;
+  }
+  const otherCats = currentCategories.filter(c=>c!==cat);
+  openModal(`
+    <label>"${esc(cat)}" tiene ${affected.length} producto(s) asignado(s)</label>
+    <div class="meta" style="margin-bottom:8px;">¿A qué categoría quieres moverlos?</div>
+    <select id="dc-target">
+      <option value="">Sin categoría</option>
+      ${otherCats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}
+    </select>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-danger" id="dc-confirm">Mover y borrar categoría</button>
+    </div>
+  `);
+  document.getElementById('dc-confirm').addEventListener('click', ()=>{
+    const target = document.getElementById('dc-target').value || null;
+    affected.forEach(it=>{ it.category = target; });
+    save();
+    currentCategories = currentCategories.filter(c=>c!==cat);
+    saveCategoriesToCloud();
+    closeModal();
+    render();
+  });
+}
+
+let overlayHistoryPushed = false;
+function pushOverlayHistory(){
+  if(!overlayHistoryPushed){
+    history.pushState({ overlay: true }, '');
+    overlayHistoryPushed = true;
+  }
+}
+function maybePopOverlayHistory(){
+  setTimeout(()=>{
+    const modalOpen = document.getElementById('modal-overlay').classList.contains('open');
+    const scanOpen = document.getElementById('scanner-overlay').classList.contains('open');
+    if(!modalOpen && !scanOpen && overlayHistoryPushed){
+      overlayHistoryPushed = false;
+      history.back();
+    }
+  }, 0);
+}
+function openModal(html){
+  document.getElementById('modal').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+  pushOverlayHistory();
+}
+let modalStack = [];
+function closeModal(){
+  if(modalStack.length>0){
+    history.back();
+  } else {
+    document.getElementById('modal-overlay').classList.remove('open');
+    maybePopOverlayHistory();
+  }
+}
+document.getElementById('modal-overlay').addEventListener('click', e=>{
+  if(e.target.id==='modal-overlay') closeModal();
+});
+
+document.getElementById('btn-add-manual').addEventListener('click', ()=> showItemForm(null));
+
+function showItemForm(barcode){
+  openModal(`
+    <div id="lookup-status" class="meta" style="margin-bottom:6px;"></div>
+    <label>Nombre del producto</label>
+    <input id="f-name" placeholder="Arroz, aceite, leche...">
+    <label>Cantidad inicial</label>
+    ${stepperHtml('f-qty', 1)}
+    <label>Mínimo antes de reponer</label>
+    ${stepperHtml('f-min', 1)}
+    <label>Stock objetivo (cuánto tener después de comprar)</label>
+    ${stepperHtml('f-target', 1)}
+    <label>Ubicación</label>
+    ${locationFieldHtml('f-location', getLastLocation())}
+    <label>Categoría</label>
+    ${categoryFieldHtml('f-category', '')}
+    ${barcode?`<div class="meta" style="margin-top:8px;">Código escaneado: ${esc(barcode)}</div>`:''}
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-accent" id="f-save">Guardar</button>
+    </div>
+  `);
+  bindSteppers(document.getElementById('modal'));
+  bindLocationField('f-location');
+  bindCategoryField('f-category');
+  document.getElementById('f-save').addEventListener('click', ()=>{
+    const name = document.getElementById('f-name').value.trim();
+    const errEl = document.getElementById('f-name');
+    if(!name){ errEl.style.borderColor = 'var(--danger)'; return; }
+    const qty = stepperVal('f-qty');
+    const min = stepperVal('f-min');
+    const target = Math.max(min, stepperVal('f-target'));
+    const location = locationFieldVal('f-location');
+    setLastLocation(location);
+    const category = categoryFieldVal('f-category');
+    const id = barcode || ('m_'+Date.now());
+    items[id] = { id, name, qty, min, target, location, category, barcode: barcode||null };
+    save(); closeModal(); currentTab='inv'; render();
+  });
+
+  if(barcode){
+    lookupBarcode(barcode);
+  }
+}
+
+async function lookupBarcode(barcode){
+  const statusEl = document.getElementById('lookup-status');
+  if(!statusEl) return;
+  statusEl.textContent = 'Buscando producto...';
+  try{
+    const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(barcode)}.json`);
+    const data = await res.json();
+    if(data && data.status===1 && data.product){
+      const p = data.product;
+      const suggested = [p.product_name, p.brands].filter(Boolean).join(' - ');
+      if(suggested){
+        const nameInput = document.getElementById('f-name');
+        if(nameInput){ nameInput.value = suggested; }
+        statusEl.textContent = 'Producto encontrado, revisa el nombre sugerido.';
+        return;
+      }
+    }
+    statusEl.textContent = 'No se encontró en la base de datos. Escribe el nombre manual (puedes pegarlo si lo copiaste con la cámara del teléfono).';
+  }catch(e){
+    statusEl.textContent = 'No se pudo buscar el producto (sin conexión). Escribe el nombre manual.';
+  }
+}
+
+document.getElementById('btn-scan').addEventListener('click', ()=>{ scanContinuousMode = null; startScan('out'); });
+document.getElementById('btn-close-scan').addEventListener('click', ()=>{ scanContinuousMode = null; stopScan(); });
+document.getElementById('btn-flip-cam').addEventListener('click', async ()=>{
+  useFrontCamera = !useFrontCamera;
+  localStorage.setItem('camPref', useFrontCamera ? 'front' : 'back');
+  if(html5QrCode){ try{ await html5QrCode.stop(); html5QrCode.clear(); }catch(e){} html5QrCode=null; }
+  startScan(scanContinuousMode || 'out');
+});
+
+async function startScan(mode){
+  document.getElementById('scan-mode-label').textContent = mode==='in' ? 'Modo ingresar (compra) — sigue escaneando' : 'Escanear producto';
+  document.getElementById('scanner-overlay').classList.add('open');
+  pushOverlayHistory();
+  document.getElementById('scan-status').textContent = useFrontCamera ? 'Cámara delantera' : 'Cámara trasera';
+  const bottomActions = document.getElementById('scan-bottom-actions');
+  if(mode==='in'){
+    bottomActions.style.display = 'block';
+    bottomActions.innerHTML = `<button class="btn btn-accent" id="btn-end-in" style="width:100%;padding:16px;font-size:16px;">✅ Fin ingreso</button>`;
+    document.getElementById('btn-end-in').addEventListener('click', ()=>{
+      scanContinuousMode = null;
+      stopScan();
+    });
+  } else {
+    bottomActions.style.display = 'none';
+    bottomActions.innerHTML = '';
+  }
+  html5QrCode = new Html5Qrcode('reader');
+  try{
+    await html5QrCode.start(
+      { facingMode: useFrontCamera ? 'user' : 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 150 } },
+      onScanSuccess,
+      ()=>{}
+    );
+    const videoEl = document.querySelector('#reader video');
+    if(videoEl){ videoEl.style.transform = useFrontCamera ? 'scaleX(-1)' : 'none'; }
+  }catch(e){
+    document.getElementById('scan-status').textContent = 'No se pudo abrir esa cámara. Prueba con la otra usando el botón 🔄.';
+  }
+}
+async function stopScan(){
+  document.getElementById('scanner-overlay').classList.remove('open');
+  document.getElementById('scan-bottom-actions').style.display = 'none';
+  if(html5QrCode){ try{ await html5QrCode.stop(); html5QrCode.clear(); }catch(e){} html5QrCode=null; }
+  maybePopOverlayHistory();
+}
+
+function scanBarcodeInto(fieldId, reopenCallback){
+  document.getElementById('modal-overlay').classList.remove('open');
+  barcodeScanCallback = (code)=>{
+    if(findItemByAnyCode(code)){
+      alert('Ese código de barras ya está siendo usado por otro producto.');
+      reopenCallback();
+      return;
+    }
+    reopenCallback();
+    const input = document.getElementById(fieldId);
+    if(input) input.value = code;
+  };
+  scanContinuousMode = null;
+  startScan('out');
+}
+
+async function onScanSuccess(decodedText){
+  if(pendingBarcode===decodedText) return;
+  pendingBarcode = decodedText;
+
+  if(barcodeScanCallback){
+    await stopScan();
+    const cb = barcodeScanCallback;
+    barcodeScanCallback = null;
+    pendingBarcode = null;
+    cb(decodedText);
+    return;
+  }
+
+  const it = findItemByAnyCode(decodedText);
+  if(it){
+    await stopScan();
+    let qtyVal = 1;
+    const renderModal = ()=>{
+      openModal(`
+        <label>${esc(it.name)}</label>
+        <div class="meta">Tienes ${it.qty} ahora.</div>
+        ${it.pendingStore ? `
+        <div class="card" style="border-color:var(--accent);margin:10px 0;">
+          <div class="row">
+            <div class="meta">Compraste ${it.pendingStore}, pendiente de guardar</div>
+            <button class="btn btn-accent" id="scan-mark-stored">Guardar compra</button>
+          </div>
+        </div>` : ''}
+        <label>Cantidad</label>
+        <div class="row" style="gap:12px;justify-content:center;margin:10px 0;">
+          <button class="btn btn-round btn-outline" id="scan-qty-minus" style="width:52px;height:52px;font-size:26px;">–</button>
+          <div class="qty" id="scan-qty-display" style="font-size:28px;min-width:50px;">${qtyVal}</div>
+          <button class="btn btn-round btn-outline" id="scan-qty-plus" style="width:52px;height:52px;font-size:26px;">+</button>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-danger" id="scan-out">Sacar</button>
+          <button class="btn ${scanContinuousMode==='in'?'btn-accent':'btn-outline'}" id="scan-in">Ingresar (compra)</button>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-outline" id="scan-cancel" style="width:100%;">Cancelar</button>
+        </div>
+      `);
+      if(it.pendingStore){
+        document.getElementById('scan-mark-stored').addEventListener('click', ()=>{
+          markStored(it.id);
+          closeModal();
+          pendingBarcode = null;
+          if(scanContinuousMode==='in'){ startScan('in'); }
+        });
+      }
+      document.getElementById('scan-qty-minus').addEventListener('click', ()=>{
+        qtyVal = Math.max(1, qtyVal-1);
+        document.getElementById('scan-qty-display').textContent = qtyVal;
+      });
+      document.getElementById('scan-qty-plus').addEventListener('click', ()=>{
+        qtyVal += 1;
+        document.getElementById('scan-qty-display').textContent = qtyVal;
+      });
+      document.getElementById('scan-out').addEventListener('click', ()=>{
+        it.qty = Math.max(0, it.qty - qtyVal);
+        scanContinuousMode = null;
+        save(); closeModal(); render();
+        pendingBarcode = null;
+      });
+      document.getElementById('scan-in').addEventListener('click', ()=>{
+        it.qty += qtyVal;
+        it.wanted = false;
+        scanContinuousMode = 'in';
+        save(); closeModal(); render();
+        pendingBarcode = null;
+        startScan('in');
+      });
+      document.getElementById('scan-cancel').addEventListener('click', ()=>{
+        scanContinuousMode = null;
+        closeModal();
+        pendingBarcode = null;
+      });
+    };
+    renderModal();
+  } else {
+    await stopScan();
+    pendingBarcode = null;
+    scanContinuousMode = null;
+    showNewCodeOptions(decodedText);
+  }
+}
+
+function showNewCodeOptions(barcode){
+  const existing = Object.values(items).filter(it=>it.id!==barcode);
+  openModal(`
+    <label>Código nuevo: ${esc(barcode)}</label>
+    <div class="meta" style="margin-bottom:10px;">¿Es un producto nuevo, o quieres vincularlo a uno que ya tienes (ej. "Yogurt" genérico)?</div>
+    <button class="btn btn-accent" id="nco-create" style="width:100%;">+ Crear producto nuevo</button>
+    ${existing.length>0 ? `
+    <div class="meta" style="margin:14px 0 4px;">— o vincular a un producto existente —</div>
+    <select id="nco-existing">
+      <option value="">-- Elegir producto --</option>
+      ${existing.sort((a,b)=>a.name.localeCompare(b.name)).map(it=>`<option value="${it.id}">${esc(it.name)}</option>`).join('')}
+    </select>
+    <button class="btn btn-outline" id="nco-link" style="width:100%;margin-top:8px;">Vincular código a este producto</button>
+    ` : ''}
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()" style="width:100%;">Cancelar</button>
+    </div>
+  `);
+  document.getElementById('nco-create').addEventListener('click', ()=>{
+    closeModal();
+    showItemForm(barcode);
+  });
+  const linkBtn = document.getElementById('nco-link');
+  if(linkBtn){
+    linkBtn.addEventListener('click', ()=>{
+      const targetId = document.getElementById('nco-existing').value;
+      if(!targetId) return;
+      const target = items[targetId];
+      target.barcodes = target.barcodes || [];
+      if(!target.barcodes.includes(barcode)) target.barcodes.push(barcode);
+      save(); closeModal(); render();
+    });
+  }
+}
+
+function exportBackup(){
+  const dataStr = JSON.stringify(items, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `despensa-respaldo-${fecha}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+
+document.getElementById('import-input').addEventListener('change', (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const parsed = JSON.parse(ev.target.result);
+      const count = Object.keys(parsed).length;
+      openModal(`
+        <label>Se encontraron ${count} productos en el archivo.</label>
+        <div class="meta">Importar reemplazará todo tu inventario actual. Esta acción no se puede deshacer.</div>
+        <div class="modal-actions">
+          <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+          <button class="btn btn-danger" id="confirm-import">Reemplazar inventario</button>
+        </div>
+      `);
+      document.getElementById('confirm-import').addEventListener('click', async ()=>{
+        const oldIds = Object.keys(items);
+        items = parsed;
+        for(const oldId of oldIds){
+          if(!items[oldId]) await deleteFromCloud(oldId);
+        }
+        save();
+        closeModal();
+        currentTab = 'inv';
+        render();
+      });
+    }catch(err){
+      alert('El archivo no es un respaldo válido.');
+    }
+    document.getElementById('import-input').value = '';
+  };
+  reader.readAsText(file);
+});
+
+window.addEventListener('popstate', ()=>{
+  if(modalStack.length>0){
+    const prev = modalStack.pop();
+    prev.render();
+    return;
+  }
+  overlayHistoryPushed = false;
+  const scanOpen = document.getElementById('scanner-overlay').classList.contains('open');
+  const modalOpen = document.getElementById('modal-overlay').classList.contains('open');
+  if(scanOpen){
+    document.getElementById('scanner-overlay').classList.remove('open');
+    document.getElementById('scan-bottom-actions').style.display = 'none';
+    if(html5QrCode){ html5QrCode.stop().then(()=>html5QrCode.clear()).catch(()=>{}); html5QrCode=null; }
+  }
+  if(modalOpen){
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+});
+
+</script>
+</body>
+</html>
